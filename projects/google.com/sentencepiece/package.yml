@@ -20,6 +20,9 @@ build:
     freedesktop.org/pkg-config: ~0.29
   working-directory: build
   script:
+    # this is not a fix; this is a test
+    - run: sed -i 's/\+brewing//g' *.py
+      working-directory: ${{deps.python.org.prefix}}/lib/python3.11
     - cmake .. $CMAKE_ARGS
     - make --jobs {{ hw.concurrency }} install
 
