@@ -4,20 +4,34 @@ distributable:
 
 versions:
   github: google/sentencepiece/releases/tags
-  ignore: '1.0.0'  # whoops, who tagged this then?
+  ignore: '1.0.0' # whoops, who tagged this then?
+
+dependencies:
+  linux:
+    # error: no matching function for call to 'atomic_fetch_add' with llvm
+    # needs libstdc++
+    gnu.org/gcc: '*'
 
 build:
   dependencies:
     cmake.org: ^3
-    python.org: '>=3<3.12'
+    python.org: ~3.11
     pip.pypa.io: '*'
     freedesktop.org/pkg-config: ~0.29
   working-directory: build
-  script: |
-    cmake .. -DCMAKE_INSTALL_PREFIX="{{prefix}}" -DCMAKE_BUILD_TYPE=Release
-    make --jobs {{ hw.concurrency }} install
+  script:
+    - cmake .. $CMAKE_ARGS
+    - make --jobs {{ hw.concurrency }} install
 
-    pip install ../python --verbose  --prefix="{{prefix}}"
+    - pip install ../python --verbose  --prefix="{{prefix}}"
+  env:
+    CMAKE_ARGS:
+      - -DCMAKE_INSTALL_PREFIX="{{prefix}}"
+      - -DCMAKE_BUILD_TYPE=Release
+    # FIXME: for some reason, only linux/x86-64 is finding the build dir instead of the final prefix...
+    linux/x86-64:
+      CMAKE_ARGS:
+        - -DCMAKE_CXX_FLAGS=-L{{deps.python.org.prefix}}/lib
 
 provides:
   - bin/spm_decode
@@ -33,7 +47,7 @@ runtime:
 test:
   dependencies:
     gnu.org/wget: '*'
-    python.org: '>=3<3.12'
+    python.org: ~3.11
   script: |
     wget https://raw.githubusercontent.com/google/sentencepiece/master/data/botchan.txt
     spm_train --input=botchan.txt --model_prefix=m --vocab_size=1000
