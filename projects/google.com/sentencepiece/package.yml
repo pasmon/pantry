@@ -23,7 +23,7 @@ build:
         ${CMAKE_ARGS[@]}
         -DCMAKE_CXX_FLAGS="-stdlib=libc++ -isystem {{deps.llvm.org.prefix}}/include/c++/v1"
         )
-    - cmake .. ${CMAKE_ARGS[@]}
+    - cmake .. "${CMAKE_ARGS[@]}"
     - make --jobs {{ hw.concurrency }} install
 
     - pip install ../python --verbose  --prefix="{{prefix}}"
