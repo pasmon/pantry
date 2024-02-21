@@ -19,10 +19,9 @@ build:
   working-directory: build
   script:
     - CMAKE_ARGS=($CMAKE_ARGS)
-    - run: CMAKE_ARGS=(
-        ${CMAKE_ARGS[@]}
-        -DCMAKE_CXX_FLAGS="-stdlib=libc++ -isystem {{deps.llvm.org.prefix}}/include/c++/v1"
-        )
+    - run: |
+        CXXFLAGS="$CXXFLAGS -stdlib=libc++ -isystem {{deps.llvm.org.prefix}}/include/c++/v1"
+        CMAKE_ARGS=(${CMAKE_ARGS[@]} "-DCMAKE_CXX_FLAGS=$CXXFLAGS")
       if: linux
     - cmake .. "${CMAKE_ARGS[@]}"
     - make --jobs {{ hw.concurrency }} install
