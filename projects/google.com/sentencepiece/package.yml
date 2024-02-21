@@ -23,6 +23,7 @@ build:
         ${CMAKE_ARGS[@]}
         -DCMAKE_CXX_FLAGS="-stdlib=libc++ -isystem {{deps.llvm.org.prefix}}/include/c++/v1"
         )
+      if: linux
     - cmake .. "${CMAKE_ARGS[@]}"
     - make --jobs {{ hw.concurrency }} install
 
@@ -31,6 +32,10 @@ build:
     CMAKE_ARGS:
       - -DCMAKE_INSTALL_PREFIX="{{prefix}}"
       - -DCMAKE_BUILD_TYPE=Release
+    linux:
+      CC: clang
+      CXX: clang++
+      LD: clang
 
 provides:
   - bin/spm_decode
