@@ -8,9 +8,7 @@ versions:
 
 dependencies:
   linux:
-    # error: no matching function for call to 'atomic_fetch_add' with llvm
-    # needs libstdc++
-    gnu.org/gcc: '*'
+    llvm.org: '*' # libc++
 
 build:
   dependencies:
@@ -20,10 +18,12 @@ build:
     freedesktop.org/pkg-config: ~0.29
   working-directory: build
   script:
-    # this is not a fix; this is a test
-    - run: sed -i 's/\+brewing//g' *.py
-      working-directory: ${{deps.python.org.prefix}}/lib/python3.11
-    - cmake .. $CMAKE_ARGS
+    - CMAKE_ARGS=($CMAKE_ARGS)
+    - run: CMAKE_ARGS=(
+        ${CMAKE_ARGS[@]}
+        -DCMAKE_CXX_FLAGS="-stdlib=libc++ -isystem {{deps.llvm.org.prefix}}/include/c++/v1"
+        )
+    - cmake .. ${CMAKE_ARGS[@]}
     - make --jobs {{ hw.concurrency }} install
 
     - pip install ../python --verbose  --prefix="{{prefix}}"
@@ -31,10 +31,6 @@ build:
     CMAKE_ARGS:
       - -DCMAKE_INSTALL_PREFIX="{{prefix}}"
       - -DCMAKE_BUILD_TYPE=Release
-    # FIXME: for some reason, only linux/x86-64 is finding the build dir instead of the final prefix...
-    linux/x86-64:
-      CMAKE_ARGS:
-        - -DCMAKE_CXX_FLAGS=-L{{deps.python.org.prefix}}/lib
 
 provides:
   - bin/spm_decode
