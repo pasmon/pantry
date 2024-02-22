@@ -16,8 +16,6 @@ build:
     python.org: ~3.11
     pip.pypa.io: '*'
     freedesktop.org/pkg-config: ~0.29
-    linux:
-      llvm.org: '*'
   working-directory: build
   script:
     - CMAKE_ARGS=($CMAKE_ARGS)
@@ -33,10 +31,6 @@ build:
     CMAKE_ARGS:
       - -DCMAKE_INSTALL_PREFIX="{{prefix}}"
       - -DCMAKE_BUILD_TYPE=Release
-    linux:
-      CC: clang
-      CXX: clang++
-      LD: clang
 
 provides:
   - bin/spm_decode
