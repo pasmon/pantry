@@ -8,7 +8,7 @@ versions:
 
 dependencies:
   linux:
-    llvm.org: '*' # libc++
+    gnu.org/gcc: '*' # libstdc++
 
 build:
   dependencies:
@@ -16,11 +16,13 @@ build:
     python.org: ~3.11
     pip.pypa.io: '*'
     freedesktop.org/pkg-config: ~0.29
+    linux:
+      llvm.org: '*'
   working-directory: build
   script:
     - CMAKE_ARGS=($CMAKE_ARGS)
     - run: |
-        CXXFLAGS="$CXXFLAGS -stdlib=libc++ -isystem {{deps.llvm.org.prefix}}/include/c++/v1"
+        CXXFLAGS="$CXXFLAGS -isystem {{deps.gnu.org/gcc.prefix}}/include/c++/{{deps.gnu.org/gcc.version}}"
         CMAKE_ARGS=(${CMAKE_ARGS[@]} "-DCMAKE_CXX_FLAGS=$CXXFLAGS")
       if: linux
     - cmake .. "${CMAKE_ARGS[@]}"
